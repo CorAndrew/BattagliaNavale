@@ -1,0 +1,16 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="BattagliaNavale.InserimentoView">
+    <Grid ColumnDefinitions="*, 300" ColumnSpacing="15">
+        <UniformGrid Name="GrigliaInserimento" Grid.Column="0" Rows="10" Columns="10"/>
+
+        <StackPanel Grid.Column="1" Spacing="10">
+            <TextBlock Text="Fase Inserimento Navi" FontWeight="Bold" FontSize="16"/>
+            <TextBlock Name="TxtNaveCorrente" TextWrapping="Wrap"/>
+            <CheckBox Name="ChkOrizzontale" Content="Orientamento Orizzontale" IsChecked="True"/>
+            <Button Name="BtnResetCampo" Content="Svuota Campo" Click="BtnResetCampo_Click"/>
+            <TextBlock Text="Log Inserimento:" FontWeight="Bold"/>
+            <TextBox Name="TxtLogInserimento" IsReadOnly="True" AcceptsReturn="True" Height="220"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -1,0 +1,15 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="BattagliaNavale.GiocoView">
+    <Grid ColumnDefinitions="*, 320" ColumnSpacing="15">
+        <UniformGrid Name="GrigliaGioco" Grid.Column="0" Rows="10" Columns="10"/>
+
+        <StackPanel Grid.Column="1" Spacing="10">
+            <TextBlock Text="Fase di Gioco" FontWeight="Bold" FontSize="16"/>
+            <TextBlock Name="TxtMosse" Text="Mosse: 0" FontWeight="Bold"/>
+            <TextBlock Name="TxtNaviRimaste" Text="Navi non affondate: 0" FontWeight="Bold"/>
+            <TextBlock Text="Log Partita:" FontWeight="Bold"/>
+            <TextBox Name="TxtLogGioco" IsReadOnly="True" AcceptsReturn="True" Height="280"/>
+        </StackPanel>
+    </Grid>
+</UserControl>
