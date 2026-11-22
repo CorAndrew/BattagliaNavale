@@ -15,7 +15,6 @@ namespace BattagliaNavale
             campo = campoRiferimento;
             bottoniGioco = new Button[CCampo.DimensioneGriglia, CCampo.DimensioneGriglia];
 
-            // Registrazione delegati per gestire spari, affondamenti e contatori
             campo.OnEsitoSparo = GestisciEsitoSparo;
             campo.OnNaveAffondata = GestisciNaveAffondata;
             campo.OnStatoAggiornato = GestisciStatoAggiornato;
