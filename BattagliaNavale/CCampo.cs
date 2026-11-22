@@ -11,10 +11,10 @@ namespace BattagliaNavale
         public List<int> FlottaRichiesta { get; set; }
         public int MosseEffettuate { get; set; }
 
-        public EsitoSparoHandler OnEsitoSparo;
-        public NaveAffondataHandler OnNaveAffondata;
-        public StatoPartitaHandler OnStatoAggiornato;
-        public InserimentoNaveHandler OnNaveInserita;
+        public event EventHandler<SparoEventArgs> EsitoSparo;
+        public event EventHandler<NaveAffondataEventArgs> NaveAffondata;
+        public event EventHandler<StatoPartitaEventArgs> StatoAggiornato;
+        public event EventHandler<InserimentoNaveEventArgs> NaveInserita;
 
         private int prossimoIdNave;
 
@@ -30,18 +30,34 @@ namespace BattagliaNavale
             PulisciCampo();
         }
 
+        protected virtual void OnEsitoSparo(SparoEventArgs e)
+        {
+            EsitoSparo?.Invoke(this, e);
+        }
+
+        protected virtual void OnNaveAffondata(NaveAffondataEventArgs e)
+        {
+            NaveAffondata?.Invoke(this, e);
+        }
+
+        protected virtual void OnStatoAggiornato(StatoPartitaEventArgs e)
+        {
+            StatoAggiornato?.Invoke(this, e);
+        }
+
+        protected virtual void OnNaveInserita(InserimentoNaveEventArgs e)
+        {
+            NaveInserita?.Invoke(this, e);
+        }
+
         private void InizializzaFlottaRichiesta()
         {
             FlottaRichiesta.Clear();
-            // 1 nave da 4 celle
             FlottaRichiesta.Add(4);
-            // 2 navi da 3 celle
             FlottaRichiesta.Add(3);
             FlottaRichiesta.Add(3);
-            // 2 navi da 2 celle
             FlottaRichiesta.Add(2);
             FlottaRichiesta.Add(2);
-            // 1 nave da 1 cella
             FlottaRichiesta.Add(1);
         }
 
@@ -87,20 +103,15 @@ namespace BattagliaNavale
                 return false;
             }
 
-            // Verifica limiti griglia e sovrapposizioni
+            // Passo di avanzamento: orizzontale = si muove su y, verticale = si muove su x
+            int dx = orizzontale ? 0 : 1;
+            int dy = orizzontale ? 1 : 0;
+
+            // Prima verifica che tutte le celle siano valide e libere
             for (int k = 0; k < dimensione; k++)
             {
-                int cx = startX;
-                int cy = startY;
-
-                if (orizzontale)
-                {
-                    cy = startY + k;
-                }
-                else
-                {
-                    cx = startX + k;
-                }
+                int cx = startX + k * dx;
+                int cy = startY + k * dy;
 
                 if (cx < 0 || cx >= DimensioneGriglia || cy < 0 || cy >= DimensioneGriglia)
                 {
@@ -108,29 +119,19 @@ namespace BattagliaNavale
                     return false;
                 }
 
-                CNave cellaOccupata = Griglia[cx, cy] as CNave;
-                if (cellaOccupata != null)
+                if (Griglia[cx, cy] is CNave)
                 {
                     errore = "C'e' gia' una nave in posizione (" + cx + "," + cy + ").";
                     return false;
                 }
             }
 
-            // Creazione celle della nave
+            // Poi crea i pezzi della nave
             List<CNave> celleNave = new List<CNave>();
             for (int k = 0; k < dimensione; k++)
             {
-                int cx = startX;
-                int cy = startY;
-
-                if (orizzontale)
-                {
-                    cy = startY + k;
-                }
-                else
-                {
-                    cx = startX + k;
-                }
+                int cx = startX + k * dx;
+                int cy = startY + k * dy;
 
                 CNave pezzo = new CNave(cx, cy, dimensione, prossimoIdNave);
                 Griglia[cx, cy] = pezzo;
@@ -147,11 +148,7 @@ namespace BattagliaNavale
 
             bool completa = FlottaCompleta();
             string msg = "Inserita nave da " + dimensione + " celle in (" + startX + "," + startY + ").";
-
-            if (OnNaveInserita != null)
-            {
-                OnNaveInserita(msg, completa);
-            }
+            OnNaveInserita(new InserimentoNaveEventArgs(msg, completa));
 
             return true;
         }
@@ -179,10 +176,7 @@ namespace BattagliaNavale
             CCella cella = Griglia[x, y];
             if (cella.Colpita)
             {
-                if (OnEsitoSparo != null)
-                {
-                    OnEsitoSparo(x, y, "Casella (" + x + "," + y + ") gia' colpita.");
-                }
+                OnEsitoSparo(new SparoEventArgs(x, y, "Casella (" + x + "," + y + ") gia' colpita."));
                 return;
             }
 
@@ -192,33 +186,20 @@ namespace BattagliaNavale
             CNave naveColpita = cella as CNave;
             if (naveColpita != null)
             {
-                string msgColpito = "Colpito in posizione (" + x + "," + y + ")";
-                if (OnEsitoSparo != null)
-                {
-                    OnEsitoSparo(x, y, msgColpito);
-                }
+                OnEsitoSparo(new SparoEventArgs(x, y, "Colpito in posizione (" + x + "," + y + ")"));
 
                 if (naveColpita.IsAffondata())
                 {
                     int rimaste = ContaNaviNonAffondate();
-                    if (OnNaveAffondata != null)
-                    {
-                        OnNaveAffondata(naveColpita.Dimensione, rimaste);
-                    }
+                    OnNaveAffondata(new NaveAffondataEventArgs(naveColpita.Dimensione, rimaste));
                 }
             }
             else
             {
-                if (OnEsitoSparo != null)
-                {
-                    OnEsitoSparo(x, y, "Acqua !!");
-                }
+                OnEsitoSparo(new SparoEventArgs(x, y, "Acqua !!"));
             }
 
-            if (OnStatoAggiornato != null)
-            {
-                OnStatoAggiornato(MosseEffettuate, ContaNaviNonAffondate());
-            }
+            OnStatoAggiornato(new StatoPartitaEventArgs(MosseEffettuate, ContaNaviNonAffondate()));
         }
     }
 }

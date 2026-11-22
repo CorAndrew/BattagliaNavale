@@ -15,12 +15,28 @@ namespace BattagliaNavale
             campo = campoRiferimento;
             bottoniGioco = new Button[CCampo.DimensioneGriglia, CCampo.DimensioneGriglia];
 
-            campo.OnEsitoSparo = GestisciEsitoSparo;
-            campo.OnNaveAffondata = GestisciNaveAffondata;
-            campo.OnStatoAggiornato = GestisciStatoAggiornato;
+            campo.EsitoSparo += Campo_EsitoSparo;
+            campo.NaveAffondata += Campo_NaveAffondata;
+            campo.StatoAggiornato += Campo_StatoAggiornato;
 
             CostruisciGriglia();
             AggiornaVista();
+        }
+
+        private void Campo_EsitoSparo(object sender, SparoEventArgs e)
+        {
+            TxtLogGioco.Text = TxtLogGioco.Text + e.MessaggioLog + "\n";
+        }
+
+        private void Campo_NaveAffondata(object sender, NaveAffondataEventArgs e)
+        {
+            TxtLogGioco.Text = TxtLogGioco.Text + "Nave da " + e.DimensioneNave + " celle AFFONDATA! (Navi rimaste: " + e.NaviRimaste + ")\n";
+        }
+
+        private void Campo_StatoAggiornato(object sender, StatoPartitaEventArgs e)
+        {
+            TxtMosse.Text = "Mosse: " + e.Mosse;
+            TxtNaviRimaste.Text = "Navi non affondate: " + e.NaviRimaste;
         }
 
         private void CostruisciGriglia()
@@ -68,22 +84,6 @@ namespace BattagliaNavale
 
             campo.Spara(x, y);
             AggiornaVista();
-        }
-
-        private void GestisciEsitoSparo(int x, int y, string messaggioLog)
-        {
-            TxtLogGioco.Text = TxtLogGioco.Text + messaggioLog + "\n";
-        }
-
-        private void GestisciNaveAffondata(int dimensioneNave, int naviRimaste)
-        {
-            TxtLogGioco.Text = TxtLogGioco.Text + "Nave da " + dimensioneNave + " celle AFFONDATA! (Navi rimaste: " + naviRimaste + ")\n";
-        }
-
-        private void GestisciStatoAggiornato(int mosse, int naviRimaste)
-        {
-            TxtMosse.Text = "Mosse: " + mosse;
-            TxtNaviRimaste.Text = "Navi non affondate: " + naviRimaste;
         }
 
         public void AggiornaVista()

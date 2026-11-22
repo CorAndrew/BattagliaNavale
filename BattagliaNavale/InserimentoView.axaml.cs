@@ -15,11 +15,19 @@ namespace BattagliaNavale
             campo = campoRiferimento;
             bottoniGriglia = new Button[CCampo.DimensioneGriglia, CCampo.DimensioneGriglia];
 
-            // Collegamento tramite delegato
-            campo.OnNaveInserita = GestisciNaveInserita;
+            campo.NaveInserita += Campo_NaveInserita;
 
             CostruisciGriglia();
             AggiornaVista();
+        }
+
+        private void Campo_NaveInserita(object sender, InserimentoNaveEventArgs e)
+        {
+            TxtLogInserimento.Text = TxtLogInserimento.Text + e.MessaggioLog + "\n";
+            if (e.FlottaCompleta)
+            {
+                TxtLogInserimento.Text = TxtLogInserimento.Text + "Flotta completa! Puoi passare a Gioco.\n";
+            }
         }
 
         private void CostruisciGriglia()
@@ -79,15 +87,6 @@ namespace BattagliaNavale
             }
 
             AggiornaVista();
-        }
-
-        private void GestisciNaveInserita(string messaggioLog, bool flottaCompleta)
-        {
-            TxtLogInserimento.Text = TxtLogInserimento.Text + messaggioLog + "\n";
-            if (flottaCompleta)
-            {
-                TxtLogInserimento.Text = TxtLogInserimento.Text + "Flotta completa! Puoi passare a Gioco.\n";
-            }
         }
 
         public void BtnResetCampo_Click(object sender, RoutedEventArgs e)

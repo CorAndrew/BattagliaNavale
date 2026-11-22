@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BattagliaNavale
 {
@@ -23,14 +24,7 @@ namespace BattagliaNavale
                 return Colpita;
             }
 
-            for (int i = 0; i < PartiNave.Count; i++)
-            {
-                if (!PartiNave[i].Colpita)
-                {
-                    return false;
-                }
-            }
-            return true;
+            return PartiNave.All(p => p.Colpita);
         }
 
         public override string SimboloStato()
